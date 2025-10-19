@@ -51,7 +51,7 @@ contract KipuBank is ReentrancyGuard, AccessControl {
     AggregatorV3Interface private dataFeed;
 
     /// @notice USDC token contract address
-    IERC20 private immutable usdcToken;
+    IERC20 private usdcToken;
 
     /// @notice Total number of deposit operations performed
     uint256 private depositsCount;
@@ -102,6 +102,9 @@ contract KipuBank is ReentrancyGuard, AccessControl {
     
     /// @notice Emitted when data feed is updated by operator
     event DataFeedUpdated(address indexed operator, address oldDataFeed, address newDataFeed);
+
+    /// @notice Emitted when the USDC address is updated by operator
+    event USDCAddressUpdated(address indexed operator, address oldUSDC, address newUSDC);
     
     /// @notice Emitted when a role is granted to a user
     event RoleGrantedByAdmin(address indexed admin, address indexed account, bytes32 indexed role);
@@ -145,8 +148,8 @@ contract KipuBank is ReentrancyGuard, AccessControl {
     /// @notice Error thrown when token transfer fails
     error TokenTransferFailed();
 
-    /// @notice Error thrown when caller doesn't have required role
-    error AccessDenied();
+    /// @notice Error thrown when bank is paused due to maintenance
+    error BankPausedError();
 
     /**
      * @dev Constructor that sets the limits and configures access control.
@@ -189,7 +192,7 @@ contract KipuBank is ReentrancyGuard, AccessControl {
      */
     modifier whenNotPaused() {
         if (bankPaused) {
-            revert AccessDenied();
+            revert BankPausedError();
         }
         _;
     }
@@ -326,11 +329,11 @@ contract KipuBank is ReentrancyGuard, AccessControl {
      */
     function _getETHPriceUSD() private view returns (uint256) {
         (
-            uint80 /* roundId */,
+            /* uint80 roundId */,
             int256 price,
-            uint256 /* startedAt */,
+            /*uint256 startedAt */,
             uint256 updatedAt,
-            uint80 /* answeredInRound */
+            /* uint80 answeredInRound */
         ) = dataFeed.latestRoundData();
         
         // Check if price is positive and recent (within 1 hour)
@@ -550,5 +553,21 @@ contract KipuBank is ReentrancyGuard, AccessControl {
         dataFeed = AggregatorV3Interface(newDataFeed);
         
         emit DataFeedUpdated(msg.sender, oldDataFeed, newDataFeed);
+    }
+    
+    /**
+     * @dev Update the USDC address.
+     * @notice Only operators can call this function.
+     * @param newUSDC New USDC address.
+     */
+    function updateUSDC(address newUSDC) external onlyRole(OPERATOR_ROLE) {
+        if (newUSDC == address(0)) {
+            revert InvalidContract();
+        }
+
+        address oldUSDCToken = address(usdcToken);
+        usdcToken = IERC20(newUSDC);
+
+        emit USDCAddressUpdated(msg.sender, oldUSDCToken, newUSDC);
     }
 }
