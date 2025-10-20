@@ -178,11 +178,32 @@ See **[USE_CASES.md](USE_CASES.md)** for detailed test cases including:
 - **Purpose**: Interface for Chainlink compatibility
 - **Functions**: `latestAnswer()`, `latestRoundData()`
 
+## ⚖️ Design Trade-offs
+
+### **Unified USD Accounting**
+- ✅ **Benefit**: Simplified limit checks across tokens
+- ⚠️ **Trade-off**: Requires real-time ETH price conversion (gas cost)
+
+### **Immutable Limits**
+- ✅ **Benefit**: Gas efficient, tamper-proof security
+- ⚠️ **Trade-off**: Requires contract redeployment to change limits
+
+### **Role-Based Access**
+- ✅ **Benefit**: Granular permissions, operational flexibility
+- ⚠️ **Trade-off**: Additional complexity vs single-admin model
+
+### **6-Decimal USD Standard**
+- ✅ **Benefit**: USDC compatibility, precision balance
+- ⚠️ **Trade-off**: ETH conversion math complexity
+
 ## ⚠️ Important Notes
 
 - **Testing**: Stub contracts are designed only for development and testing
-- **Production**: Use real Chainlink and USDC addresses on mainnet.
-- **Oracles**: Fixed price is only for testing, use dynamic feeds on production
+- **Production**: Use real Chainlink and USDC addresses on mainnet
+- **Security**: Perform complete audit before production deployment
+- **Oracles**: Fixed price is only for testing, use dynamic feeds in production
+
+## 📄 License
 
 - **KipuBank on Sepolia**: *0x09cE4B882c46c430cA28A4DfD30fFf21DCcDAD29*
 - **Custom USDC Token on Sepolia**: *0xc22c484da337f1d4be2cbf27fb1ed69fa772a240*
