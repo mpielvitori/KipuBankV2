@@ -398,6 +398,15 @@ contract KipuBank is ReentrancyGuard, AccessControl {
     }
 
     /**
+     * @dev Public view function to get the current USDC token address.
+     * @return The address of the USDC token contract.
+     * @notice This function can be called by any user without gas cost.
+     */
+    function getUSDCAddress() external view returns (address) {
+        return address(usdcToken);
+    }
+
+    /**
      * @dev Public view function to get the current total bank value in USD.
      * @return The total USD value currently deposited in the bank (6 decimals).
      * @notice This function can be called by any user without gas cost.
