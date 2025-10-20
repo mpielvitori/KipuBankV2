@@ -1,158 +1,201 @@
 # KipuBank - Smart Contract
 
-![Solidity](https://img.shields.io/badge/Solidity-^0.8.20-blue)
+![Solidity](https://img.shields.io/badge/Solidity-^0.8.22-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-## 📋 Descripción
+## 📋 Description
 
-KipuBank es un contrato inteligente desarrollado en Solidity que simula un banco descentralizado simple. Permite a los usuarios depositar y retirar Ether (ETH) con restricciones de seguridad implementadas, incluyendo límites por transacción y capacidad global del banco.
+KipuBank is a smart contract developed in Solidity that simulates a multi-token decentralized bank. It allows users to deposit and withdraw ETH and USDC with implemented security restrictions, including per-transaction limits and global bank capacity.
 
-### Características Principales
+### Main Features
 
-- **Bóvedas Personales**: Cada usuario tiene su propio saldo de ETH
-- **Depósitos Limitados**: Capacidad máxima global configurable (`bankCap`)
-- **Retiros Controlados**: Límite fijo por transacción (`withdrawalLimit`)
-- **Seguridad Avanzada**: Protección contra reentrancy y validaciones exhaustivas
-- **Eventos y Estadísticas**: Registro completo de operaciones
+- **Multi-Token Support**: Support for ETH and USDC with unified USD accounting
+- **Price Oracles**: Chainlink integration for real-time ETH/USD conversions
+- **Access Control**: Role-based system (Admin/Operator) with OpenZeppelin AccessControl
+- **Advanced Security**: Reentrancy protection and comprehensive validations
+- **Configurable Limits**: Global capacity and USD withdrawal limits
+- **Events and Statistics**: Complete multi-token operation logging
 
-## 🏗️ Arquitectura del Contrato
+## 🏗️ Contract Architecture
 
-### Variables Clave
-- `withdrawalLimit` (inmutable): Máximo ETH por retiro
-- `bankCap` (inmutable): Capacidad total del banco
-- `balances`: Saldos individuales por dirección
-- `depositsCount` y `withdrawalsCount`: Contadores de operaciones
+### Key Variables
+- `withdrawalLimitUSD` (immutable): Maximum USD per withdrawal
+- `bankCapUSD` (immutable): Total bank capacity in USD
+- `balances`: User balances mapping by user and token (address(0) = ETH)
+- `dataFeed`: Chainlink oracle for ETH/USD prices
+- `usdcToken`: USDC contract address
 
-### Funciones Principales
+### Main Functions
 
-| Función | Visibilidad | Descripción |
-|---------|------------|-------------|
-| `deposit()` | external payable | Depositar ETH en bóveda personal |
-| `withdraw(amount)` | external | Retirar ETH (limitado por `withdrawalLimit`) |
-| `balances(address)` | public view | Consultar saldo de cualquier usuario |
-| `getBankBalance()` | external view | Ver total de ETH en el banco |
-| `getDepositsCount()` | external view | Ver número de depósitos |
-| `getWithdrawalsCount()` | external view | Ver número de retiros |
+| Function | Visibility | Description |
+|----------|-----------|-------------|
+| `deposit()` | external payable | Deposit ETH (converted to USD internally) |
+| `depositUSD(amount)` | external | Deposit USDC directly |
+| `withdraw(amount)` | external | Withdraw ETH (validated in USD) |
+| `withdrawUSD(amount)` | external | Withdraw USDC directly |
+| `getUserBalanceUSD(user, token)` | external view | View user USD balance by token |
+| `getBankValueUSD()` | external view | View total USD value of bank |
+| `getETHPriceUSD()` | external view | View current ETH/USD price |
 
-### Seguridad Implementada
-- ✅ **Protección Reentrancy**: Modificador `noReentrancy`
-- ✅ **Patrón CEI**: Checks-Effects-Interactions correctamente implementado
-- ✅ **Errores Personalizados**: 7 tipos de errores específicos
-- ✅ **Transferencias Seguras**: Uso de `.call()` para envío de ETH
-- ✅ **Funciones Públicas**: Acceso transparente a estadísticas
+### Implemented Security
+- ✅ **Reentrancy Protection**: OpenZeppelin ReentrancyGuard
+- ✅ **Access Control**: Admin/Operator role-based system
+- ✅ **CEI Pattern**: Checks-Effects-Interactions properly implemented
+- ✅ **Custom Errors**: Specific error types for each validation
+- ✅ **Safe Transfers**: Use of `.call()` for ETH and standard ERC20
+- ✅ **Oracle Validation**: Verification of valid price data
 
-## 🚀 Despliegue en Remix IDE
+## 🚀 Deployment on Remix IDE
 
-### Paso 1: Preparación
-1. Abrir [Remix IDE](https://remix.ethereum.org)
-2. Conectar MetaMask a **Sepolia Testnet**
-3. Asegurarse de tener ETH de prueba ([Faucet Sepolia](https://cloud.google.com/application/web3/faucet/ethereum/sepolia))
+### Step 1: Preparation
+1. Open [Remix IDE](https://remix.ethereum.org)
+2. Connect MetaMask to **Sepolia Testnet**
+3. Ensure you have test ETH ([Sepolia Faucet](https://faucet.aragua.org/))
 
-### Paso 2: Compilación
-1. Crear archivo `KipuBank.sol` en carpeta `contracts/`
-2. Copiar el código del contrato
-3. Ir a "Solidity Compiler" → Versión `0.8.20+`
-4. Click "Compile KipuBank.sol"
+### Step 2: Deploy Auxiliary Contracts
+1. Compile and deploy `Circle.sol` (USDC stub)
+2. Compile and deploy `Oracle.sol` (Price feed stub)
+3. Note the deployed addresses
 
-### Paso 3: Despliegue
-1. Ir a "Deploy & Run Transactions"
-2. Environment: "Injected Provider - MetaMask"
-3. Configurar parámetros del constructor:
+### Step 3: Deploy KipuBank
+1. Go to "Solidity Compiler" → Version `0.8.22+`
+2. Compile `KipuBank.sol`
+3. Configure constructor parameters:
 
 ```
-_withdrawalLimit: 10000000000000000    (0.01 ETH en wei)
-_bankCap:      50000000000000000    (0.05 ETH en wei)
+_withdrawalLimitUSD: 1000000000     (1,000 USD with 6 decimals)
+_bankCapUSD:         5000000000     (5,000 USD with 6 decimals)
+_dataFeed:           DEPLOYED_ORACLE_ADDRESS
+_usdcToken:          DEPLOYED_CIRCLE_ADDRESS
 ```
 
-4. Click "Deploy" → Confirmar en MetaMask
-5. ✅ ¡Contrato desplegado!
+4. Click "Deploy" → Confirm in MetaMask
+5. ✅ Contract deployed!
 
-## 🔧 Interacción con el Contrato
+## 🔧 Contract Interaction
 
-### Realizar Depósitos
+### Making ETH Deposits
 ```javascript
-// En Remix:
-// 1. Ir a "VALUE" → Ingresar cantidad en wei
-// 2. Click en botón "deposit" (naranja)
-// 3. Confirmar transacción en MetaMask
+// In Remix:
+// 1. Go to "VALUE" → Enter amount in wei
+// 2. Click "deposit" button (orange)
+// 3. Confirm transaction in MetaMask
 
-Ejemplos de valores:
-0.02 ETH = 20000000000000000 wei
-0.01 ETH = 10000000000000000 wei
-0.005 ETH = 5000000000000000 wei
+Example values:
+0.1 ETH = 100000000000000000 wei (~$411.78)
+0.05 ETH = 50000000000000000 wei (~$205.89)
 ```
 
-### Realizar Retiros
+### Making USDC Deposits
 ```javascript
-// En función "withdraw":
-// 1. Ingresar cantidad en wei (máximo = withdrawalLimit)
-// 2. Click "withdraw" → Confirmar en MetaMask
+// 1. First approve USDC in Circle contract:
+approve(KIPUBANK_ADDRESS, 1000000000) // 1,000 USDC
 
-Validaciones:
-- amount <= withdrawalLimit ✓
-- amount <= balances[msg.sender] ✓
+// 2. Then deposit in KipuBank:
+depositUSD(1000000000) // 1,000 USDC (6 decimals)
 ```
 
-### Consultas Públicas (Sin Gas)
+### Making Withdrawals
 ```javascript
-// Ver saldo personal
-balances("0xTuDireccion") → returns saldo en wei
+// Withdraw ETH:
+withdraw(50000000000000000) // 0.05 ETH
 
-// Ver versión del contrato
-VERSION() → returns "1.0.0"
+// Withdraw USDC:
+withdrawUSD(500000000) // 500 USDC
 
-// Ver estadísticas del banco
-getBankBalance() → ETH total en el banco
-getDepositsCount() → Número de depósitos
-getWithdrawalsCount() → Número de retiros
+// Automatic validations:
+- USD limit per transaction ✓
+- Sufficient balance ✓
 ```
 
-## 📊 Eventos y Monitoreo
+### Public Queries (No Gas)
+```javascript
+// View USD balance by token
+getUserBalanceUSD("0xYourAddress", "0x000...000") → ETH balance in USD
+getUserBalanceUSD("0xYourAddress", USDC_ADDRESS) → USDC balance
 
-### Eventos Emitidos
-- `Deposit(address indexed account, uint256 amount)`
-- `Withdraw(address indexed account, uint256 amount)`
+// View bank statistics
+getBankValueUSD() → Total USD value of bank
+getETHPriceUSD() → Current ETH/USD price from oracle
+getDepositsCount() → Number of deposits
+getWithdrawalsCount() → Number of withdrawals
+```
 
-Los eventos aparecen en la consola de Remix después de cada transacción exitosa y pueden usarse para tracking de operaciones.
+## 📊 Events and Monitoring
 
-## 🛡️ Errores Personalizados
+### Emitted Events
+- `Deposit(address indexed account, address indexed token, string tokenSymbol, uint256 originalAmount, uint256 usdValue)`
+- `Withdraw(address indexed account, address indexed token, string tokenSymbol, uint256 originalAmount, uint256 usdValue)`
+- `BankPaused(address indexed admin)` / `BankUnpaused(address indexed admin)`
+- `DataFeedUpdated(address indexed operator, address oldDataFeed, address newDataFeed)`
+- `RoleGrantedByAdmin(address indexed admin, address indexed account, bytes32 indexed role)`
 
-| Error | Cuando Ocurre |
-|-------|---------------|
-| `ExceedsBankCap` | Depósito supera capacidad del banco |
-| `ExceedsWithdrawLimit` | Retiro supera límite por transacción |
-| `InsufficientBalance` | Saldo insuficiente para retiro |
-| `TransferFailed` | Fallo en envío de ETH |
-| `ReentrancyDetected` | Intento de ataque detectado |
-| `InvalidWithdrawLimit` | Parámetro constructor inválido |
-| `InvalidBankCap` | Parámetro constructor inválido |
+Events appear in the Remix console after each successful transaction and include detailed information about original amounts and USD values.
 
-## 🧪 Casos de Prueba Recomendados
+## 🛡️ Custom Errors
 
-1. **✅ Depósito válido**: Depositar 0.02 ETH → Success
-2. **❌ Exceder bankCap**: Intentar depositar más del límite total
-3. **✅ Retiro válido**: Retirar 0.01 ETH con saldo suficiente
-4. **❌ Exceder withdrawalLimit**: Intentar retirar más del límite
-5. **❌ Saldo insuficiente**: Retirar más ETH del disponible
-6. **✅ Consultar estadísticas**: Usar funciones `getDepositsCount()`, etc.
+| Error | When It Occurs |
+|-------|----------------|
+| `ExceedsBankCapUSD` | Deposit exceeds bank's USD capacity |
+| `ExceedsWithdrawLimitUSD` | Withdrawal exceeds USD limit per transaction |
+| `InsufficientBalanceUSD` | Insufficient USD balance for withdrawal |
+| `TransferFailed` | ETH transfer failure |
+| `InvalidContract` | Invalid contract address |
+| `ZeroAmount` | Attempted deposit/withdrawal with amount 0 |
+| `BankPausedError` | Operation blocked by bank pause |
 
-## ⚠️ Nota sobre Transparencia en Blockchain
+## 🧪 Test Cases
 
-**Importante**: Las variables marcadas como `private` en Solidity **no son realmente privadas** en blockchain. Solo restringen el acceso programático, pero cualquier persona puede leer el storage del contrato directamente.
+See **[USE_CASES.md](USE_CASES.md)** for detailed test cases including:
 
-### ¿Por qué usar getters públicos?
-Las funciones de consulta son públicas porque:
-- **Transparencia total**: Los datos son públicos de todas formas
-- **Facilidad de uso**: Más fácil para dApps que leer storage directamente
-- **Requerimientos educativos**: Demostrar funciones `external view`
-- **Honestidad técnica**: No simular privacidad que no existe
+1. **✅ Valid ETH/USDC deposits**: With automatic USD conversions
+2. **✅ Valid ETH/USDC withdrawals**: Validated against USD limits  
+3. **❌ Exceed bankCapUSD**: Attempt to deposit more than total limit
+4. **❌ Exceed withdrawalLimitUSD**: Attempt to withdraw more than per-transaction limit
+5. **✅ Admin functions**: Pause/unpause bank, grant roles
+6. **✅ Operator functions**: Update price oracles
+7. **✅ State queries**: Balances, prices, statistics
 
-**Ventaja**: Elimina complejidad innecesaria y es más honesto sobre las capacidades de blockchain.
+**Recommended test configuration:**
+- Withdrawal Limit: 1,000 USD
+- Bank Cap: 5,000 USD  
+- Fixed ETH price: $4,117.88 (for testing)
 
-## 📄 Licencia
+## 🔗 Auxiliary Contracts
 
-MIT License - Ver `LICENSE` para detalles completos.
+### Circle.sol (USDC Stub)
+- **Purpose**: Simulates USDC token for testing
+- **Decimals**: 6 (same as real USDC)
+- **Functions**: `mint()`, `decimals()`, standard ERC20
+
+### Oracle.sol (Price Feed Stub)  
+- **Purpose**: Simulates Chainlink ETH/USD oracle
+- **Fixed price**: $4,117.88 (for consistent testing)
+- **Decimals**: 8 (Chainlink standard)
+- **Compatibility**: AggregatorV3Interface
+
+### IOracle.sol
+- **Purpose**: Interface for Chainlink compatibility
+- **Functions**: `latestAnswer()`, `latestRoundData()`
+
+## ⚠️ Important Notes
+
+- **Testing**: Stub contracts are designed only for development and testing
+- **Production**: Use real Chainlink and USDC addresses on mainnet.
+- **Oracles**: Fixed price is only for testing, use dynamic feeds on production
+
+- **KipuBank on Sepolia**: *0x09cE4B882c46c430cA28A4DfD30fFf21DCcDAD29*
+- **Custom USDC Token on Sepolia**: *0xc22c484da337f1d4be2cbf27fb1ed69fa772a240*
+- **Custom Data Feed on Sepolia**: *0xcdb9f8df0e2224587035a0811a85ce94ec07e0ff*
+- **Custom fixed ETH Price**: $4,117.88 (411788170000 with 8 decimals)
+- **Mint USDC from Custom Circle**: your_address, 10000000000
+- **ETH/USD Chainlink Ethereum Sepolia**: *0x694AA1769357215DE4FAC081bf1f309aDC325306*
+- **USDC Ethereum Sepolia**: *0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238*
+
+## 📄 License
+
+MIT License - See `LICENSE` for complete details.
 
 ---
 
-**⚠️ Importante**: Este contrato es para propósitos educativos. Realizar auditoría de seguridad antes de uso en producción.
+**⚠️ Important**: This contract is for educational purposes. Stub contracts (Circle, Oracle) are designed only for testing. Perform complete security audit before production use.

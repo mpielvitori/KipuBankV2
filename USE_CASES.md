@@ -1,77 +1,69 @@
 
 
-## 🧪 **Casos de Prueba para KipuBank en Sepolia**
+## 🧪 **KipuBank Test Cases**
 
-### 📋 **Configuración Inicial:**
+## 🔍 **Case 1: Verify Initial Configuration**
 
-- **Withdrawal Limit USD**: 1,000 USD (1000000000 con 6 decimales)
-- **Bank Cap USD**: 5,000 USD (5000000000 con 6 decimales)
-- **Data Feed**: 0xcdb9f8df0e2224587035a0811a85ce94ec07e0ff (Custom Oracle ETH/USD Sepolia)
-- **USDC Token**: 0xc22c484da337f1d4be2cbf27fb1ed69fa772a240 (Custom Circle USDC Sepolia)
-
-
-## 🔍 **Caso 1: Verificar Configuración Inicial**
-
-### **Acciones a ejecutar:**
+### **Actions to execute:**
 ```
-// 1. Verificar límites del banco
+// 1. Verify bank limits
 getBankCapUSD() 
-// Resultado esperado: 5000000000 (5,000 USD)
+// Expected result: 5000000000 (5,000 USD)
 
 getWithdrawalLimitUSD()
-// Resultado esperado: 1000000000 (1,000 USD)
+// Expected result: 1000000000 (1,000 USD)
 
-// 2. Verificar precio del oracle
+// 2. Verify oracle price
 getETHPriceUSD()
-// Resultado esperado: 411788170000 ($4,117.88)
+// Expected result: 411788170000 ($4,117.88)
 
-// 3. Verificar estado inicial
+// 3. Verify initial state
 getBankValueUSD()
-// Resultado esperado: 0
+// Expected result: 0
 
 isBankPaused()
-// Resultado esperado: false
+// Expected result: false
 ```
 
-## 🔍 **Caso 2: Depósito de ETH (Exitoso)**
+## 🔍 **Case 2: ETH Deposit (Successful)**
 
-### **Acción:**
+### **Action:**
 ```
-// Depositar 0.1 ETH (que vale ~$411.78)
+// Deposit 0.1 ETH (worth ~$411.78)
 deposit()
-// Value: 100000000000000000 (0.1 ETH en wei)
+// Value: 100000000000000000 (0.1 ETH in wei)
 ```
-### **Resultados esperados:**
+### **Expected results:**
 ```
-getUserBalanceUSD(TU_DIRECCION, "0x0000000000000000000000000000000000000000")
-// Resultado esperado: ~411788170 (USD con 6 decimales)
+getUserBalanceUSD(YOUR_ADDRESS, "0x0000000000000000000000000000000000000000")
+// Expected result: ~411788170 (USD with 6 decimals)
 
 getBankValueUSD()
-// Resultado esperado: ~411788170
+// Expected result: ~411788170
 399898662
 
 getDepositsCount()
-// Resultado esperado: 1
+// Expected result: 1
 
-getUserETHBalance(TU_DIRECCION)
-// Resultado esperado: ~100000000000000000 (0.1 ETH en wei)
+getUserETHBalance(YOUR_ADDRESS)
+// Expected result: ~100000000000000000 (0.1 ETH in wei)
 ```
-### **Evento esperado:**
-`Deposit(tu_direccion, 0x000...000, "ETH", 100000000000000000, 411788170)`
+### **Expected event:**
+`Deposit(your_address, 0x000...000, "ETH", 100000000000000000, 411788170)`
 
-## 🔍 **Caso 3: Depósito de USDC (Exitoso)**
+## 🔍 **Case 3: USDC Deposit (Successful)**
 
-### **Preparación:**
+### **Preparation:**
 ```
-// 1. Primero, aprobar USDC para el contrato KipuBank
-// En el contrato Circle (USDC):
-approve(DIRECCION_KIPUBANK, 1000000000)
-// 1000000000 = 1,000 USDC (6 decimales)
+// 1. First, approve USDC for KipuBank contract
+// In Circle contract (USDC):
+approve(KIPUBANK_ADDRESS, 1000000000)
+// 1000000000 = 1,000 USDC (6 decimals)
 ```
 
-### **Acción:**
+### **Action:**
 ```
-// 2. Depositar 1,000 USDC
+// 2. Deposit 1,000 USDC
 depositUSD(1000000000)
 ```
 
@@ -94,11 +86,11 @@ getBankUSDCBalance()
 `Transfer(tu_direccion, DIRECCION_KIPU_BANK, 1000000000)`
 `Deposit(tu_direccion, DIRECCION_CIRCLE, "USDC", 1000000000, 1000000000)`
 
-## 🔍 **Caso 4: Retiro de ETH (Exitoso)**
+## 🔍 **Case 4: ETH Withdrawal (Successful)**
 
-### **Acción:**
+### **Action:**
 ```
-// Retirar 0.05 ETH (que vale ~$205.89)
+// Withdraw 0.05 ETH (worth ~$205.89)
 withdraw(50000000000000000)
 // 50000000000000000 = 0.05 ETH en wei
 ```
@@ -118,11 +110,11 @@ getBankValueUSD()
 ### **Evento esperado:**
 `Withdraw(tu_direccion, 0x000...000, "ETH", 50000000000000000, 205894085)`
 
-## 🔍 **Caso 5: Retiro de USDC (Exitoso)**
+## 🔍 **Case 5: USDC Withdrawal (Successful)**
 
-### **Acción:**
+### **Action:**
 ```
-// Retirar 500 USDC
+// Withdraw 500 USDC
 withdrawUSD(500000000)
 ```
 
@@ -146,13 +138,13 @@ getWithdrawalsCount()
 
 ---
 
-## 🚫 **Caso 6: Intentar Exceder Withdrawal Limit**
+## 🚫 **Case 6: Attempt to Exceed Withdrawal Limit**
 
-### **Acción:**
+### **Action:**
 
 ```
-// Intentar retirar más de $1,000 USD
-// Calcular: 1000 USD / 4117.88 USD/ETH ≈ 0.243 ETH
+// Attempt to withdraw more than $1,000 USD
+// Calculate: 1000 USD / 4117.88 USD/ETH ≈ 0.243 ETH
 withdraw(250000000000000000)
 // 0.25 ETH en wei (más de $1,000)
 ```
@@ -178,15 +170,15 @@ withdraw(250000000000000000)
 
 ---
 
-## 🚫 **Caso 7: Intentar Exceder Bank Cap**
+## 🚫 **Case 7: Attempt to Exceed Bank Cap**
 
-### **Preparación:**
+### **Preparation:**
 
 ```
-// Calcular cuánto falta para llegar al cap de $5,000
+// Calculate how much is left to reach $5,000 cap
 getBankValueUSD()
-// Supongamos que devuelve 705894085 (~$705.89)
-// Falta: 5000 - 705.89 = $4,294.10
+// Suppose it returns 705894085 (~$705.89)
+// Remaining: 5000 - 705.89 = $4,294.10
 ```
 
 
@@ -218,12 +210,12 @@ depositUSD(5000000000)
 
 ---
 
-## 🔍 **Caso 8: Funciones de Admin**
+## 🔍 **Case 8: Admin Functions**
 
-### **Pausar como user NO admin:**
+### **Pause as NON-admin user:**
 
 ```
-// Como usuario NO admin, pausar el banco
+// As NON-admin user, pause the bank
 pauseBank()
 ```
 
@@ -243,7 +235,7 @@ pauseBank()
 ### **Pausar como user admin:**
 
 ```
-// Como admin, pausar el banco
+// As admin, pause the bank
 pauseBank()
 ```
 
@@ -297,9 +289,9 @@ hasRole(ROLE_OPERADOR, DIRECCION_OPERADOR)
 
 ---
 
-## 🔍 **Caso 9: Funciones de Operator**
+## 🔍 **Case 9: Operator Functions**
 
-### **Acción:**
+### **Action:**
 
 ```
 // Como operator, actualizar el data feed
@@ -318,28 +310,23 @@ getDataFeed()
 
 ---
 
-## 📊 **Notas:**
-
-- **Precio ETH del Oracle**: $4,117.88 (411788170000 con 8 decimales)
-- **Mint USDC desde Circle**: tu_direccion, 10000000000
-- **ETH/USD Chainlink Ethereum Sepolia**: 0x694AA1769357215DE4FAC081bf1f309aDC325306
-- **USDC Ethereum Sepolia**: 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+## 📊 **Quick reference:**
 
 ```
-// Depósitos ETH en wei:
+// ETH deposits in wei:
 10000000000000000    // 0.01 ETH
 50000000000000000    // 0.05 ETH  
 100000000000000000   // 0.1 ETH
 250000000000000000   // 0.25 ETH
 1000000000000000000  // 1 ETH
 
-// Depósitos/Retiros USDC (6 decimales):
+// USDC deposits/withdrawals (6 decimals):
 1000000     // 1 USDC
 100000000   // 100 USDC
 500000000   // 500 USDC
 1000000000  // 1,000 USDC
 5000000000  // 5,000 USDC
 
-// Direcciones especiales:
-0x0000000000000000000000000000000000000000  // address(0) para ETH
+// Special addresses:
+0x0000000000000000000000000000000000000000  // address(0) for ETH
 ```
