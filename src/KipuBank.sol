@@ -5,6 +5,7 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interf
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @author Martín Pielvitori
@@ -13,6 +14,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * @notice This contract demonstrates advanced Solidity patterns including multi-token accounting, decimal conversion, and oracle integration.
  */
 contract KipuBank is ReentrancyGuard, AccessControl {
+    // Apply SafeERC20 functions to all IERC20 instances
+    using SafeERC20 for IERC20;
+
     /* ===========================================
      *                  Constants
      * =========================================== */
@@ -144,9 +148,6 @@ contract KipuBank is ReentrancyGuard, AccessControl {
     
     /// @notice Error thrown when Chainlink price feed returns invalid data
     error InvalidPriceData();
-    
-    /// @notice Error thrown when token transfer fails
-    error TokenTransferFailed();
 
     /// @notice Error thrown when bank is paused due to maintenance
     error BankPausedError();
@@ -241,10 +242,7 @@ contract KipuBank is ReentrancyGuard, AccessControl {
         }
         
         // Transfer USDC from user to contract (standard ERC20 method)
-        bool success = usdcToken.transferFrom(msg.sender, address(this), amount);
-        if (!success) {
-            revert TokenTransferFailed();
-        }
+        usdcToken.safeTransferFrom(msg.sender, address(this), amount);
         
         // Effects - USDC already has 6 decimals, store directly
         balances[msg.sender][address(usdcToken)] += amount;
@@ -315,11 +313,8 @@ contract KipuBank is ReentrancyGuard, AccessControl {
         ++withdrawalsCount;
         emit Withdraw(msg.sender, address(usdcToken), "USDC", amount, amount);
         
-        // Interactions - standard ERC20 transfer
-        bool success = usdcToken.transfer(msg.sender, amount);
-        if (!success) {
-            revert TokenTransferFailed();
-        }
+        // Interactions - safe ERC20 transfer
+        usdcToken.safeTransfer(msg.sender, amount);
     }
 
     /**
