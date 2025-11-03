@@ -1,6 +1,5 @@
 
-
-## 🧪 **KipuBank Test Cases**
+# 🧪 **KipuBank Test Cases on Sepolia**
 
 ## 🔍 **Case 1: Verify Initial Configuration**
 
@@ -40,7 +39,6 @@ getUserBalanceUSD(YOUR_ADDRESS, "0x0000000000000000000000000000000000000000")
 
 getBankValueUSD()
 // Expected result: ~411788170
-399898662
 
 getDepositsCount()
 // Expected result: 1
@@ -67,24 +65,24 @@ approve(KIPUBANK_ADDRESS, 1000000000)
 depositUSD(1000000000)
 ```
 
-### **Resultados esperados:**
+### **Expected results:**
 ```
-getUserBalanceUSD(TU_DIRECCION, DIRECCION_CIRCLE)
-// Resultado esperado: 1000000000
+getUserBalanceUSD(YOUR_ADDRESS, CIRCLE_ADDRESS)
+// Expected result: 1000000000
 
 getBankValueUSD()
-// Resultado esperado: ~1411788170 (411.78 + 1000)
+// Expected result: ~1411788170 (411.78 + 1000)
 
 getDepositsCount()
-// Resultado esperado: 2
+// Expected result: 2
 
 getBankUSDCBalance()
-// Resultado esperado: 1000000000
+// Expected result: 1000000000
 ```
 
-### **Eventos esperados:**
-`Transfer(tu_direccion, DIRECCION_KIPU_BANK, 1000000000)`
-`Deposit(tu_direccion, DIRECCION_CIRCLE, "USDC", 1000000000, 1000000000)`
+### **Expected events:**
+`Transfer(your_address, KIPUBANK_ADDRESS, 1000000000)`
+`Deposit(your_address, CIRCLE_ADDRESS, "USDC", 1000000000, 1000000000)`
 
 ## 🔍 **Case 4: ETH Withdrawal (Successful)**
 
@@ -92,23 +90,23 @@ getBankUSDCBalance()
 ```
 // Withdraw 0.05 ETH (worth ~$205.89)
 withdraw(50000000000000000)
-// 50000000000000000 = 0.05 ETH en wei
+// 50000000000000000 = 0.05 ETH in wei
 ```
 
-### **Resultados esperados:**
+### **Expected results:**
 ```
-getUserBalanceUSD(TU_DIRECCION, "0x0000000000000000000000000000000000000000")
-// Resultado esperado: ~205894085 (411.78 - 205.89)
+getUserBalanceUSD(YOUR_ADDRESS, "0x0000000000000000000000000000000000000000")
+// Expected result: ~205894085 (411.78 - 205.89)
 
 getWithdrawalsCount()
-// Resultado esperado: 1
+// Expected result: 1
 
 getBankValueUSD()
-// Resultado esperado: ~1205894085
+// Expected result: ~1205894085
 ```
 
-### **Evento esperado:**
-`Withdraw(tu_direccion, 0x000...000, "ETH", 50000000000000000, 205894085)`
+### **Expected event:**
+`Withdraw(your_address, 0x000...000, "ETH", 50000000000000000, 205894085)`
 
 ## 🔍 **Case 5: USDC Withdrawal (Successful)**
 
@@ -118,22 +116,22 @@ getBankValueUSD()
 withdrawUSD(500000000)
 ```
 
-### **Resultados esperados:**
+### **Expected results:**
 
 ```
-getUserBalanceUSD(TU_DIRECCION, DIRECCION_CIRCLE)
-// Resultado esperado: 500000000
+getUserBalanceUSD(YOUR_ADDRESS, CIRCLE_ADDRESS)
+// Expected result: 500000000
 
 getBankUSDCBalance()
-// Resultado esperado: 500000000
+// Expected result: 500000000
 
 getWithdrawalsCount()
-// Resultado esperado: 2
+// Expected result: 2
 ```
 
-### **Eventos esperados:**
-`Withdraw(tu_direccion, DIRECCION_CIRCLE, "USDC", 500000000, 500000000)`
-`Transfer(DIRECCION_KIPU_BANK, tu_direccion, 500000000)`
+### **Expected events:**
+`Withdraw(your_address, CIRCLE_ADDRESS, "USDC", 500000000, 500000000)`
+`Transfer(KIPUBANK_ADDRESS, your_address, 500000000)`
 
 
 ---
@@ -146,11 +144,11 @@ getWithdrawalsCount()
 // Attempt to withdraw more than $1,000 USD
 // Calculate: 1000 USD / 4117.88 USD/ETH ≈ 0.243 ETH
 withdraw(250000000000000000)
-// 0.25 ETH en wei (más de $1,000)
+// 0.25 ETH in wei (more than $1,000)
 ```
 
 
-### **Resultado esperado:**
+### **Expected result:**
 
 ```
 ❌ Error: ExceedsWithdrawLimitUSD
@@ -182,16 +180,16 @@ getBankValueUSD()
 ```
 
 
-### **Acción:**
+### **Action:**
 
 ```
-// Intentar depositar más USDC del permitido
-// Depositar 5000 USDC completos (sumado al balance existente, excede el cap)
+// Attempt to deposit more USDC than allowed
+// Deposit full 5000 USDC (added to existing balance, exceeds cap)
 depositUSD(5000000000)
 ```
 
 
-### **Resultado esperado:**
+### **Expected result:**
 
 ```
 ❌ Error: ExceedsBankCapUSD
@@ -219,12 +217,12 @@ depositUSD(5000000000)
 pauseBank()
 ```
 
-### **Resultado esperado:**
+### **Expected result:**
 ```
 ❌ Error: AccessControlUnauthorizedAccount
 {
  "account": {
-  "value": "tu_direccion"
+  "value": "your_address"
  },
  "neededRole": {
   "value": "0xa49807205ce4d355092ef5a8a18f56e8913cf4a201fbe287825b095693c21775"
@@ -232,59 +230,59 @@ pauseBank()
 }
 ```
 
-### **Pausar como user admin:**
+### **Pause as admin user:**
 
 ```
 // As admin, pause the bank
 pauseBank()
 ```
 
-### **Verificación:**
+### **Verification:**
 
 ```
 isBankPaused()
-// Resultado esperado: true
+// Expected result: true
 
-// Intentar depositar con banco pausado
+// Attempt to deposit with paused bank
 deposit()
 // Value: 10000000000000000 (0.01 ETH)
-// Resultado esperado: ❌ Error: BankPausedError
+// Expected result: ❌ Error: BankPausedError
 ```
-### **Evento esperado:**
-`BankPaused(tu_direccion)`
+### **Expected event:**
+`BankPaused(your_address)`
 
-### **Despausar:**
+### **Unpause:**
 
 ```
 unpauseBank()
 
 isBankPaused()
-// Resultado esperado: false
+// Expected result: false
 ```
 
-### **Evento esperado:**
-`BankUnpaused(tu_direccion)`
+### **Expected event:**
+`BankUnpaused(your_address)`
 
-### **Otorgar rol de operador:**
+### **Grant operator role:**
 
-### **Acción:**
-
-```
-// Como admin, otorgar rol de operador a otra cuenta
-grantOperatorRole(DIRECCION_OPERADOR)
-```
-
-### **Verificación:**
+### **Action:**
 
 ```
-ROLE_OPERADOR -> 0x97667070c54ef182b0f5858b034beac1b6f3089aa2d3188bb1e8929f4fa9b929
-hasRole(ROLE_OPERADOR, DIRECCION_OPERADOR)
-// Resultado esperado: true
+// As admin, grant operator role to another account
+grantOperatorRole(OPERATOR_ADDRESS)
 ```
 
-### **Evento esperado:**
-`RoleGranted(ROLE_OPERADOR, DIRECCION_OPERADOR, DIRECCION_ADMIN)`
-`RoleGrantedByAdmin(DIRECCION_ADMIN, DIRECCION_OPERADOR, ROLE_OPERADOR)`
+### **Verification:**
+
+```
+OPERATOR_ROLE -> 0x97667070c54ef182b0f5858b034beac1b6f3089aa2d3188bb1e8929f4fa9b929
+hasRole(OPERATOR_ROLE, OPERATOR_ADDRESS)
+// Expected result: true
+```
+
+### **Expected event:**
+`RoleGranted(OPERATOR_ROLE, OPERATOR_ADDRESS, ADMIN_ADDRESS)`
+`RoleGrantedByAdmin(ADMIN_ADDRESS, OPERATOR_ADDRESS, OPERATOR_ROLE)`
 
 
 ---
@@ -294,19 +292,19 @@ hasRole(ROLE_OPERADOR, DIRECCION_OPERADOR)
 ### **Action:**
 
 ```
-// Como operator, actualizar el data feed
-updateDataFeed(NUEVA_DIRECCION_ORACLE)
+// As operator, update the data feed
+updateDataFeed(NEW_ORACLE_ADDRESS)
 ```
 
-### **Verificación:**
+### **Verification:**
 
 ```
 getDataFeed()
-// Resultado esperado: NUEVA_DIRECCION_ORACLE
+// Expected result: NEW_ORACLE_ADDRESS
 ```
 
-### **Evento esperado:**
-`DataFeedUpdated(tu_direccion, ANTIGUA_DIRECCION_ORACLE, NUEVA_DIRECCION_ORACLE)`
+### **Expected event:**
+`DataFeedUpdated(your_address, OLD_ORACLE_ADDRESS, NEW_ORACLE_ADDRESS)`
 
 ---
 

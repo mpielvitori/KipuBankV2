@@ -205,7 +205,7 @@ See **[USE_CASES.md](USE_CASES.md)** for detailed test cases including:
 
 ## 📄 License
 
-- **KipuBank on Sepolia**: [0x09cE4B882c46c430cA28A4DfD30fFf21DCcDAD29](https://sepolia.etherscan.io/address/0x09cE4B882c46c430cA28A4DfD30fFf21DCcDAD29)
+- **KipuBank on Sepolia**: [0x0C113b99C0f55f321fB6d1B4FdDD975FCa1EDB13](https://sepolia.etherscan.io/address/0x0C113b99C0f55f321fB6d1B4FdDD975FCa1EDB13)
 - **Custom USDC Token on Sepolia**: [0xc22c484da337f1d4be2cbf27fb1ed69fa772a240](https://sepolia.etherscan.io/address/0xc22c484da337f1d4be2cbf27fb1ed69fa772a240)
 - **Custom Data Feed on Sepolia**: [0xcdb9f8df0e2224587035a0811a85ce94ec07e0ff](https://sepolia.etherscan.io/address/0xcdb9f8df0e2224587035a0811a85ce94ec07e0ff)
 - **Custom fixed ETH Price**: $4,117.88 (411788170000 with 8 decimals)
